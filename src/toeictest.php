@@ -1,10 +1,10 @@
-// Chọn một đề ngẫu nhiên để test
 
 <?php 
     include_once '../function.php';
     $part = getPartOfToeic();
     $topicId = $_GET['topicId'];
     $questions = getQuestions($topicId);
+    var_dump($questions);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,20 +26,29 @@
 <body>
     <?php include 'navbar.php';?>
     <div class = "main-content">
+        <!-- Câu hỏi -->
         <div class="question-list">
             <div class="question-list-row">
-                <?php 
-                    foreach ($part as $value){
-                        echo $value['id'] . "   " . $value['name'];
+            <?php 
+            foreach ($questions as $value){
+            ?>
+            <button  tabindex="0" type="button">
+            <?php 
+            echo $value['sentence_id'];
+            ?>
+                <span class="MuiTouchRipple-root css-w0pj6f">
 
-                    }
-                ?>
+                </span>
+            </button>
+
+            <?php 
+                }
+            ?>
             </div>
         </div>
-        <div>
-
-        </div>
     </div>
+    
+
 </body>
 <?php include 'footer.php'; ?>
 </html>

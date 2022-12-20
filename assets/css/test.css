@@ -12,6 +12,20 @@ div {
     display: block;
 }
 
+.main-content{
+    background: rgba(197, 197, 197, 0.87);
+    padding: 16px 22px;
+    border-radius: 0 15px 15px 15px;
+}
+
+.user-panel{
+    padding-right: 10px;
+}
+
+.me-auto2 {
+    margin-right: 10px;
+}
+
 
 .question-list{
     padding: 16px 22px;
@@ -24,4 +38,133 @@ div {
     justify-items: center;
     gap: 5px;
     width: 100%;
+}
+
+
+.practice-list-item{
+    background: #fff;
+    padding: 16px;
+    border-bottom: 1px solid #f2f3f7;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    border: rgb(79, 79, 79) solid 0.1px;
+}
+
+.practice-item-name{
+    color: #535353;
+    font-weight: 500;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.practice-item-progress{
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.progress-box{
+    border: 1px solid rgb(186, 205, 255);
+    color: rgb(101, 110, 241);
+    background: rgb(232, 238, 255);
+}
+
+.list-content{
+    padding-left: 24px;
+    padding-right: 24px;
+    max-width: 992px;
+    width: 100%;
+    margin-left: auto;
+    box-sizing: border-box;
+    margin-right: auto;
+    display: block;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.question-palette-main{
+    padding: 16px 22px;
+    background: #fff;
+    border-radius: 0 15px 15px 15px;
+}
+
+.question-palette-header{
+
+}
+
+.question-palette-title{
+
+}
+
+.question-palette-body{
+    
+}
+
+.questions-list-row{
+    display: grid;
+    grid-template-columns: repeat(8,1fr);
+    justify-items: center;
+    gap: 5px;
+    width: 100%;
+}
+
+#question-palette-panel .question-palette-body .question-item.p-item-played {
+    background: #007aff!important;
+    color: #fff!important;
+}
+
+#question-palette-panel .question-palette-body .question-item.p-item-current-index {
+    background: #fff;
+    color: #1d1d1d;
+}
+
+#question-palette-panel .question-palette-body .question-item.p-item-current-game {
+    border: 2px solid #007aff;
+}
+
+#question-palette-panel .question-palette-body .question-item {
+    min-width: unset;
+    padding: unset;
+    font-family: inherit;
+    border-radius: 10px;
+    background: #f2f3f7;
+    color: #777;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.css-1yxmbwk {
+    display: inline-flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    background-color: transparent;
+    outline: 0px;
+    border: 0px;
+    margin: 0px;
+    cursor: pointer;
+    user-select: none;
+    vertical-align: middle;
+    appearance: none;
+    text-decoration: none;
+    text-align: center;
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    padding: 8px;
+    border-radius: 50%;
+    overflow: visible;
+    color: rgba(0, 0, 0, 0.54);
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.buttonQuestion{
+    
 }

@@ -2,7 +2,6 @@
     include_once '../function.php';
     if(checkLogin());
     $userInformation = getUserInformation();
-    var_dump($userInformation);
 ?>
 <!DOCTYPE html>
 <html lang="en">

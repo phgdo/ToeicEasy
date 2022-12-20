@@ -11,6 +11,7 @@
         $query = mysqli_query($conn, $sql);
         if(mysqli_num_rows($query) == 1){
             while ($row = mysqli_fetch_assoc($query)){
+                $_SESSION['userId'] = $row['id'];
                 $_SESSION['username'] = $row['username'];
                 break;
             } 
@@ -61,7 +62,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //dashboard page
     function checkLogin(){
-        if(!isset($_SESSION['username'])){
+        if(!isset($_SESSION['userId'])){
             header("location: login.php");
             return false;
         }
@@ -70,7 +71,7 @@
 
     function getUserInformation(){
         GLOBAL $conn;
-        $sql = "select * from user_information where username = '".$_SESSION['username']."'";
+        $sql = "select * from user_information where username_id = '".$_SESSION['userId']."'";
         $query = mysqli_query($conn, $sql);
         $userInfor = [];
         if(mysqli_num_rows($query) > 0){
@@ -116,6 +117,17 @@
         return $arr;
     }
 
+    function getNumQuestions($topicId){
+        GLOBAL $conn;
+        $sql = "select sentence_id from question where topic_id = '$topicId'";
+        $query = mysqli_query($conn, $sql);
+        $arr = [];
+        while ($row = mysqli_fetch_assoc($query)){
+            $arr[] = $row['sentence_id'];
+        }
+        return $arr;
+    }
+
     function getQuestions($topicId){
         GLOBAL $conn;
         $sql = "select * from question where topic_id = '$topicId'";
@@ -127,15 +139,46 @@
         return $arr;
     }
 
+    function getQuizOptions($questionId){
+        GLOBAL $conn;
+        $sql = "select * from quiz_option where question_id = '$questionId'";
+        $query = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($query);
+        return $row;
+    }
+
     function drawFormPart1($question){
         $path = '../';
         echo '<img src="'.$path.$question['image_path'].'" alt="'.$question['image_path'].'">';
-        echo '<audio src="'.$path.$question['audio_path'].'"></audio>';
-        echo '<<form action="" method="get">'
+        echo '    <audio src="'.$path.$question['audio_path'].'" controls>
+                </audio>';
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Test_select page
+    function getTopic(){
+        GLOBAL $conn;
+        $sql = "select * from topic";
+        $query = mysqli_query($conn, $sql);
+        $arr = [];
+        while ($row = mysqli_fetch_assoc($query)){
+            $arr[] = $row;
+        }
+        return $arr;
+    }
+    function getScoreFromExams ($topicId, $userId){
+        GLOBAL $conn;
+        $sql = "select score from exams where topic_id = '$topicId' and user_id = '$userId'";
+        $query = mysqli_query($conn, $sql);
+        $arr = [];
+        $row = mysqli_fetch_assoc($query);
+        //Nếu không có bảng nào trả ra thì return 0
+        if($row == null|| $row == NULL){
+            return "0";
+        }
+        else{
+            return $row['score'];
+        }
+    }
 
+    
 ?>
-<form action="" method="get">
-    <input type="radio" name="" id="">
-</form>

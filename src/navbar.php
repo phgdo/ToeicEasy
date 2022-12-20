@@ -10,7 +10,7 @@
           <a class="nav-link active" aria-current="page" href="dashboard.php">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="toeictest.php">Full Test</a>
+          <a class="nav-link" href="test_select.php">Full Test</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,11 +38,26 @@
         <li class="nav-item">
           <a class="nav-link" href="toeictest.php">Grammar</a>
         </li>
+        
       </ul>
-      <form class="d-flex">
+      <!-- <form class="d-flex">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
+      </form> -->
+      <ul class="navbar-nav me-auto2 mb-2 mb-lg-0 user-panel">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <?php 
+              $username = getUserInformation();
+              echo $username['fullname'];
+              ?>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#"></a></li>
+              <li><hr class="dropdown-divider"></li>
+            </ul>
+          </li>
+      </ul>
     </div>
   </div>
 </nav>
