@@ -16,6 +16,7 @@ div {
     background: rgba(197, 197, 197, 0.87);
     padding: 16px 22px;
     border-radius: 0 15px 15px 15px;
+    display: flex;
 }
 
 .user-panel{
@@ -167,4 +168,21 @@ div {
 
 .buttonQuestion{
     
+}
+
+.quiz-list{
+    margin-left: 10px;
+    background-color: #fff;
+    /* padding-left: 300px; */
+    width: 70%;
+}
+
+.quiz-item{
+    display: flex;
+  justify-content: center;
+    margin: 0 auto;
+}
+
+.imagequiz{
+    width: 300px;
 }

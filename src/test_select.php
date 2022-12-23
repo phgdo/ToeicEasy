@@ -2,7 +2,10 @@
     include_once '../function.php';
     if(checkLogin());
     $topic = getTopic();
-    var_dump($topic);
+    $flag = 0;
+    if($_SESSION['level'] == 1){
+        $flag = 1;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,10 +21,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 </head>
 <body>
-
-
-
     <?php include 'navbar.php'; ?>
+
+    <?php 
+    //Hiển thị nút thêm đề bài khi có quyền admin
+        if($flag == 1){
+            echo '<a href="them_de.php" class="btn btn-primary">Thêm đề</a>';
+        } 
+    ?>
     <div class="list-content">
     FULL TEST
 
@@ -33,7 +40,13 @@
             <div class="practice-list-item">
                 <div class="practice-item-name"><?php echo $value['name']; ?></div>
                 <div class="practice-item-progress">
-                    <div class="progress-box"><?php echo $score = getScoreFromExams($value['id'], $_SESSION['userId']); ?></div>
+                <?php 
+                    if($flag == 1){
+                        echo '<a href="sua_de.php?topic_id='.$value['id'].'" class="btn btn-primary">Sửa</a>';
+                        echo '<a href="them_sua_cau_hoi.php?topic_id='.$value['id'].'" class="btn btn-primary">Thêm sửa câu hỏi</a>';
+                    } 
+                ?>
+                    <div class="progress-box"><?php echo $score = getScoreFromExams($value['id'], $_SESSION['userId']) . " pts"; ?></div>
                 </div>
             </div>
             </a>

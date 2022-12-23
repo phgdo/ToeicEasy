@@ -48,7 +48,7 @@
                 <input type="text" name="username" id="username">
                 <br>
                 <label for="">Password:</label>
-                <input type="text" name="password" id="password">         
+                <input type="password" name="password" id="password">         
                 <br>
                 <input type="submit" value="Login" name="btn-login">
             </form>

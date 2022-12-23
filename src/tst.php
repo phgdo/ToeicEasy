@@ -4,8 +4,33 @@
     $part = getPartOfToeic();
     $topicId = $_GET['topicId'];
     $questions = getQuestions($topicId);
-    $examId = startQuiz($topicId, $_SESSION['userId']);
-
+    $flag = 0;
+    if(checkExamExists($topicId, $_SESSION['userId']) == true){
+        $examId = startQuiz($topicId, $_SESSION['userId']);
+        $flag = 0;
+    }
+    else{
+        $examId = getExamId($topicId, $_SESSION['userId']);
+        // var_dump(getValueForQuizAns($examId));
+        $flag = 1;
+    }
+    
+    //Xử lý nút nộp bài
+    if(isset($_POST['btnSubmit'])){
+        //Nếu không thấy optradio có nghĩa là user không chọn bất cứ đáp án nào trong toàn bộ câu hỏi
+        if(!isset($_POST['optradio'])){
+            foreach($questions as $question){
+                getQuizAnswer($examId, $question['question_id'], "0");
+            }
+        }
+        else{
+            //User đã chọn ít nhất 1 câu trả lời trong toàn bộ câu hỏi
+            foreach($_POST['optradio'] as $option_num => $option_val){
+                echo $option_num." ".$option_val."<br>";
+                getQuizAnswer($examId, $option_num, $option_val);
+            }
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,31 +48,13 @@
             display: flex;
         }
     </style>
-
-    <script>
-        function clockStart() {
-            Var counter=0
-
-            Var timer=setInterval(function{
-
-            Counter++;
-
-            // Do your task here..This will execute after every second until 7200 seconds
-
-            If(counter==7200)
-
-            clearInterval(timer)
-
-            },1000)
-        }
-    </script>
 </head>
 <body>
-    <?php include 'navbar.php';?>
+
     <div class = "main-content">
-        
         <!-- Câu hỏi -->
         <div class="question-list">
+
             <div class="question-list-row">
                 <?php 
                 foreach ($questions as $value){
@@ -64,51 +71,47 @@
                 <?php 
                     }
                 ?>
-                <form action="" method="post">
-                    <input type="submit" name="btnSubmit" value="Submit">
-                </form>
             </div>
         </div>
 
         <!-- Nội dung câu hỏi -->
+        <form method="post">
         <div class="quiz-list">
-            <?php 
+        <?php 
             foreach ($questions as $value){
                 echo "<h4>". "Question " . $value["sentence_id"]. "</h4>";
             ?>
             <div class="quiz-item">
                 <div>
-                    <form method="post">
-                    <?php drawFormPart1($value); 
-                        $quizs = getQuizOptions($value["question_id"]);
-                        echo "<br>";
-                        foreach($quizs as $quiz){
-                            echo '
-                            <input type="radio" name="optradio['.$quiz["question_id"].']" value="'.$quiz["numOption"].'">
-                            <label for="'.$quiz["question_id"].'">'.$quiz["opt"].'</label><br>
-                            ';
+                        
+                        <?php 
+                            $quizs = getQuizOptions($value["question_id"]);
 
-                                // getQuizAnswer($examId, $quiz["question_id"], $selected);
+                            foreach($quizs as $quiz){          
+                        ?>
+                                <div class="radio">
+                                    <label>
+                                    <input type="radio" <?php if(getValueForQuizAns($value["question_id"]) == $quiz["numOption"] && $flag ==1){echo "checked";} ?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $quiz["opt"]; ?></label>
+                                </div>
+                        <?php 
                         }
-                        // drawFormOption($quiz);
+                        ?>
 
-                    ?>
-                    </form>
                 </div> 
             </div>
             <?php 
             }
             ?>
         </div>
+        <input type="submit" name="btnSubmit" value="Submit">
+        </form>
+        <?php 
+
+        ?>
+
     </div>
 
-    <?php 
-    if(isset($_POST['btnSubmit'])){
-        foreach($_POST['optradio'] as $option_num => $option_val)
-        echo $option_num." ".$option_val."<br>";
-    }
 
-    ?>
 
 </body>
 <?php include 'footer.php'; ?>
