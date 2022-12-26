@@ -4,7 +4,43 @@
     $part = getPartOfToeic();
     $topicId = $_GET['topicId'];
     $questions = getQuestions($topicId);
-    $examId = startQuiz($topicId, $_SESSION['userId']);
+    $flag = 0;
+    if(checkExamExists($topicId, $_SESSION['userId']) == true){
+            //Nếu user chưa làm bài này thì tạo 1 quiz mới
+        $examId = startQuiz($topicId, $_SESSION['userId']);
+        $flag = 0;
+    }
+    else{
+        $examId = getExamId($topicId, $_SESSION['userId']);
+        // var_dump(getValueForQuizAns($examId));
+        $flag = 1;
+    }
+    
+    //Xử lý nút nộp bài
+    if(isset($_POST['btnSubmit'])){
+        //Nếu không thấy optradio có nghĩa là user không chọn bất cứ đáp án nào trong toàn bộ câu hỏi
+        if(!isset($_POST['optradio'])){
+            foreach($questions as $question){
+                getQuizAnswer($examId, $question['question_id'], "0");
+            }
+        }
+        else{
+            //User đã chọn ít nhất 1 câu trả lời trong toàn bộ câu hỏi
+            foreach($_POST['optradio'] as $option_num => $option_val){
+                getQuizAnswer($examId, $option_num, $option_val);
+            }
+        }
+        calScore($examId);
+        finishQuiz($examId);
+    }
+    //Kiểm tra xem đã nộp bài chưa để ẩn nút Submit và hiển thị đáp án
+    $done = 0;
+    if(CheckExamDone($examId) == true){
+        $done = 1;
+    }
+    else{
+        $done = 0;
+    }
 
 ?>
 <!DOCTYPE html>
@@ -23,31 +59,60 @@
             display: flex;
         }
     </style>
-
+    
+    <?php 
+        if($done==0){
+    ?>
     <script>
-        function clockStart() {
-            Var counter=0
+        // Set the date we're counting down to
+        // 1. JavaScript
+        // var countDownDate = new Date('Sep 5, 2018 15:37:25').getTime();
+        // 2. PHP
+        var countDownDate = <?php echo strtotime('now')+2*60*60 +2 ?> * 1000;
+        var now = <?php echo time() ?> * 1000;
 
-            Var timer=setInterval(function{
+        // Update the count down every 1 second
+        var x = setInterval(function() {
 
-            Counter++;
+            // Get todays date and time
+            // 1. JavaScript
+            // var now = new Date().getTime();
+            // 2. PHP
+            now = now + 1000;
 
-            // Do your task here..This will execute after every second until 7200 seconds
+            // Find the distance between now an the count down date
+            var distance = countDownDate - now;
 
-            If(counter==7200)
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            clearInterval(timer)
+            // Output the result in an element with id='countdown-timer'
+            document.getElementById('countdown-timer').innerHTML =  hours + 'h ' +
+                minutes + 'm ' + seconds + 's ';
 
-            },1000)
+            // If the count down is over, write some text 
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById('countdown-timer').innerHTML = 'EXPIRED';
+                document.getElementById('btnSubmit').click();
+            }
+        }, 1000);
+        </script>
+        <?php 
         }
-    </script>
+        ?>
 </head>
 <body>
     <?php include 'navbar.php';?>
+    <p id="countdown-timer"></p>
     <div class = "main-content">
-        
         <!-- Câu hỏi -->
+        
         <div class="question-list">
+
             <div class="question-list-row">
                 <?php 
                 foreach ($questions as $value){
@@ -64,51 +129,64 @@
                 <?php 
                     }
                 ?>
-                <form action="" method="post">
-                    <input type="submit" name="btnSubmit" value="Submit">
-                </form>
             </div>
         </div>
 
         <!-- Nội dung câu hỏi -->
+        <form method="post">
         <div class="quiz-list">
-            <?php 
+        <?php 
             foreach ($questions as $value){
                 echo "<h4>". "Question " . $value["sentence_id"]. "</h4>";
+                if($value['question']!= 'null' || $value['question']!= 'NULL'){
+                    echo $value['question'];
+                }
+                if($value['image_path']!= 'null' || $value['image_path']!= 'NULL'){
+                    echo '<img src="'.'../'.$value['image_path'].'" alt="'.$value['image_path'].'" class="imagequiz">';
+
+                }
+                if($value['audio_path']!= 'null' || $value['audio_path']!= 'NULL'){
+                    echo '<audio class="audioquiz" src="'.'../'.$value['audio_path'].'" controls>
+                    </audio>';
+                }
             ?>
             <div class="quiz-item">
                 <div>
-                    <form method="post">
-                    <?php drawFormPart1($value); 
-                        $quizs = getQuizOptions($value["question_id"]);
-                        echo "<br>";
-                        foreach($quizs as $quiz){
-                            echo '
-                            <input type="radio" name="optradio['.$quiz["question_id"].']" value="'.$quiz["numOption"].'">
-                            <label for="'.$quiz["question_id"].'">'.$quiz["opt"].'</label><br>
-                            ';
+                        
+                        <?php 
+                            $quizs = getQuizOptions($value["question_id"]);
 
-                                // getQuizAnswer($examId, $quiz["question_id"], $selected);
+                            foreach($quizs as $quiz){          
+                        ?>
+                                <div class="radio">
+                                    <label>
+                                    <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $quiz["opt"]; ?></label>
+                                </div>
+                        <?php 
                         }
-                        // drawFormOption($quiz);
+                        ?>
 
-                    ?>
-                    </form>
                 </div> 
             </div>
             <?php 
             }
             ?>
         </div>
+        <?php 
+        if($done == 0){
+            //Nếu đã 
+        ?>
+        <input type="submit" name="btnSubmit" value="Submit" id="btnSubmit">
+        <?php
+        }
+        ?>
+        </form>
+        <?php 
+
+        ?>
+
     </div>
 
-    <?php 
-    if(isset($_POST['btnSubmit'])){
-        foreach($_POST['optradio'] as $option_num => $option_val)
-        echo $option_num." ".$option_val."<br>";
-    }
-
-    ?>
 
 </body>
 <?php include 'footer.php'; ?>

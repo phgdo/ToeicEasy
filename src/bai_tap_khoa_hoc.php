@@ -34,33 +34,33 @@
 		//Giao vien
 		$topicGramar = getTopicGramar();
 		foreach ($topicGramar as $value){
-			if($flag == 1){
 				echo '
 				<div class="card w-75 mt-5">
 				<div class="card-body h2">
-					'.$value['name'].'
+					'.$value['name'].'';
+				if($flag == 1){
+				echo '
 					<a href="them_bai_tap.php?topic_id='.$value['id'].'" class="btn btn-info">Thêm bài tập</a>
 					<a href="sua_chu_de.php?topic_id='.$value['id'].'" class="btn btn-info">Sửa chủ đề</a>
-					<a href="xoa_chu_de.php?topic_id='.$value['id'].'" class="btn btn-info">Sửa chủ đề</a>
-					</div>
-					</div>
+					<a href="xoa_chu_de.php?topic_id='.$value['id'].'" class="btn btn-info">Xóa chủ đề</a>
 					';
-			}
+				}
+				echo '</div>
+				</div>';
 			$noidung = getNoiDungChuDe($value['id']);
 			foreach($noidung as $nd){
 				echo '<div class="card w-75 mt-5">
 						<div class="card-body h2">
 						<h5>'.$nd['name'].'</h5>
 						<h6>Hạn nộp: '.$nd['hannop'].'</h6>';
+						echo '<a href="chi_tiet_bai_tap.php?id_bt='.$nd['id'].'" class="btn btn-primary">Truy cập</a>';
 						if($flag == 1){
 							echo '
-							<a href="chi_tiet_bai_tap.php?id_bt='.$nd['id'].'" class="btn btn-primary">Truy cập</a>
+							<a href="quan_ly_bai_nop.php?id_bt='.$nd['id'].'" class="btn btn-primary">Quản lý bài nộp</a>
 							<a href="sua_bai_tap.php?id_bt='.$nd['id'].'" class="btn btn-info">Sửa bài tập</a>
 							<a href="xoa_bai_tap.php?id_bt='.$nd['id'].'" class="btn btn-warning">Xóa</a>
-							<a href="quan_ly_bai_nop.php?id_bt='.$nd['id'].'" class="btn btn-outline-success">Quản lý bài nộp</a>
 							';
 						}
-						echo '<a href="chi_tiet_bai_tap.php?id_bt='.$idBT.'" class="btn btn-primary">Truy cập</a>';
 			}
 		}
 			

@@ -291,20 +291,66 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         $query = mysqli_query($conn, $sql);
     }
 
+    function CheckExamDone($examId){
+        GLOBAL $conn;
+        $sql = "select done from exams where exam_id = ".$examId."";
+        $query = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($query);
+        if($row['done'] == "1"){
+            return true;
+        }
+        return false;
+    }
+
+    // function checkTimeOut(){
+    //     GLOBAL $conn;
+    //     $sql = "select done from exams where exam_id = ".$examId."";
+    //     $query = mysqli_query($conn, $sql);
+    // }
+
+
     function countDownTimer(){
-        echo '
-        <script language="JavaScript">
-        TargetDate = "2031-12-31T05:00:00";
-        BackColor = "palegreen";
-        ForeColor = "navy";
-        CountActive = true;
-        CountStepper = -1;
-        LeadingZero = true;
-        DisplayFormat = "%%D%% Days, %%H%% Hours, %%M%% Minutes, %%S%% Seconds.";
-        FinishMessage = "It is finally here!";
-        </script>
-        <script language="JavaScript" src="https://rhashemian.github.io/js/countdown.js"></script>
-        ';
+        echo "
+        <script>
+    // Set the date we're counting down to
+    // 1. JavaScript
+    // var countDownDate = new Date('Sep 5, 2018 15:37:25').getTime();
+    // 2. PHP
+    var countDownDate = <?php echo strtotime('now')+3+2 ?> * 1000;
+    var now = <?php echo time() ?> * 1000;
+
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+
+        // Get todays date and time
+        // 1. JavaScript
+        // var now = new Date().getTime();
+        // 2. PHP
+        now = now + 1000;
+
+        // Find the distance between now an the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Output the result in an element with id='countdown-timer'
+        document.getElementById('countdown-timer').innerHTML =  hours + 'h ' +
+            minutes + 'm ' + seconds + 's ';
+
+        // If the count down is over, write some text 
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById('countdown-timer').innerHTML = 'EXPIRED';
+            var button = document.getElementById('btnSubmit');
+            button.form.submit();
+        }
+    }, 1000);
+    </script>
+        ";
         
     }
 
@@ -322,6 +368,8 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         ';
 
     }
+
+
 
     function checkExamExists($topicId, $userId){
         GLOBAL $conn;
@@ -341,9 +389,9 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         return $row["exam_id"];
     }
 
-    function getValueForQuizAns($questionId){
+    function getValueForQuizAns($questionId, $examId){
         GLOBAL $conn;
-        $sql = "select your_ans from quiz_answer where question_id=".$questionId."";
+        $sql = "select your_ans from quiz_answer where question_id=".$questionId." and exam_id = ".$examId."";
         $query = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($query);
         return $row['your_ans'];
@@ -418,7 +466,13 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
             $readingScore = 5 + ($readingPoint-2)*5;
         }
 
-        $totalScore = $readingScore + $readingScore;
+        if($readingPoint+$listeningPoint==0){
+            $totalScore = 0;
+        }
+        else{
+            $totalScore = $readingScore + $readingScore;
+        }
+
 
         $sql4 = "update exams set score=".$totalScore.", lisScore=".$listeningScore.", readScore=".$readingScore.", lisPoint=".$listeningPoint.", readPoint=".$readingPoint." where exam_id = ".$examId."";
         $query4 = mysqli_query($conn, $sql4);
@@ -450,9 +504,9 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         return $row['numOption'];
     }
 
-    function finishQuiz($examId, $score){
+    function finishQuiz($examId){
         GLOBAL $conn;
-        $sql = "update exams set time_end=current_timestamp, score=".$score." where exam_id=".$examId."";
+        $sql = "update exams set time_end=current_timestamp, done = 1 where exam_id=".$examId."";
         $query = mysqli_query($conn, $sql);
     }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -510,17 +564,13 @@ function ThemChuDe($ten){
 	$query = mysqli_query($conn, $sql);
 }
 
-function ThemBaiTap($tenbt, $sobt, $hannop, $tenfile, $filetmp, $topicId){
+function ThemBaiTap($tenbt, $hannop, $tenfile, $filetmp, $topicId){
     GLOBAL $conn;
     $extension = array('pdf', 'docx', 'doc');
     $extension_file = strtolower( pathinfo($tenfile, PATHINFO_EXTENSION));
     $flag = 0;
     if(empty($tenbt)){
         echo "Hãy nhập tên bài tập.";
-        $flag = 1;
-    }
-    if(empty($sobt)){
-        echo "Hãy nhập số bài tập.";
         $flag = 1;
     }
     if(empty($hannop)){
@@ -538,7 +588,6 @@ function ThemBaiTap($tenbt, $sobt, $hannop, $tenfile, $filetmp, $topicId){
     if($flag == 0){
         //file
         $path = '../fileBT/';
-        $topicId = $_GET['topic_id'];
         $filename = $tenfile;
         $file = pathinfo($filename);
         if(file_exists($path.$filename)){
@@ -553,6 +602,272 @@ function ThemBaiTap($tenbt, $sobt, $hannop, $tenfile, $filetmp, $topicId){
         $do = mysqli_query($conn, $sql);
         
     }
+}
+
+function SuaChuDe($tenchude, $topicId){
+    GLOBAL $conn;
+    if(!empty($tenchude)){
+        $name = $tenchude;
+        $sql = "update topic_grammar set name = '$name' where id = '$topicId'";
+        $do = mysqli_query($conn, $sql);
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+function XoaChuDe($topicId){
+    GLOBAL $conn;
+        $sql = "delete from topic_grammar where id = ".$topicId."";
+        $do = mysqli_query($conn, $sql);
+}
+
+function getChiTietBaiTap($idBaiTap){
+    GLOBAL $conn;
+    $sql = "select * from noi_dung_chu_de where id = '$idBaiTap'";
+    $do = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($do);
+    return $row;
+}
+
+function GetChiTietBaiNop($idBaiTap, $userId){
+    GLOBAL $conn;
+    $sql = "select * from bainop where id = '$idBaiTap' and user_id = '$userId'";
+    $do = mysqli_query($conn, $sql);
+    if(mysqli_num_rows($do)>0){
+        $row = mysqli_fetch_assoc($do);
+        return $row;
+    }
+}
+
+function GetHanNop($idBaiTap){
+    GLOBAL $conn;
+    $sql = "select hannop from noi_dung_chu_de where id = '$idBaiTap'";
+    $do = mysqli_query($conn, $sql);
+
+    $row = mysqli_fetch_assoc($do);
+    return $row['hannop'];
+}
+
+function KiemTraHanNop($idBaiTap){
+    $hannop = GetHanNop($idBaiTap);
+    $today = date("Y-m-d H:i:s");
+    if(strtotime($today) > strtotime($hannop)){
+        return false;
+    }
+    return true;
+}
+
+
+function KiemTraDaNopBaiNop($idBaiTap, $userId){
+    GLOBAL $conn;
+    $sql = "select filename from bainop where id = '$idBaiTap' and user_id = '$userId'";
+    $do = mysqli_query($conn, $sql);
+
+    if(mysqli_num_rows($do)>0){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+function NopBaiTap($userId, $filebt, $filetmp, $idBaiTap){
+    GLOBAL $conn;
+    $extension = array('pdf', 'docx', 'doc');
+    $extension_file = strtolower( pathinfo($filebt, PATHINFO_EXTENSION));
+    $file = pathinfo($filebt);
+    $flag = 0;
+    if(empty($filebt)){
+        echo "Hãy chọn file bài tập.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../fileNop/';
+        if(file_exists($path.$filebt)){
+            $newfilename = $file['filename'] . uniqid(rand(), true). '.' . $extension_file;
+        }
+        else{
+            $newfilename = $filebt;
+        }
+        $filePath = $path.$newfilename;
+        move_uploaded_file($filetmp, $filePath);
+        $t = time();
+        $timestamp = date("Y-m-d H:i:s", $t);
+        $sql = "insert into bainop(user_id, filename, id_bai_tap) values('$userId', '$newfilename', '$idBaiTap')";
+        $do = mysqli_query($conn, $sql);
+        return true;
+    }
+
+}
+
+function SuaBaiNop( $userId, $filebt, $filetmp,$idBaiTap){
+    GLOBAL $conn;
+
+    $sql = "select id, filename from bainop where id_bai_tap = '$idBaiTap' and user_id = '$userId'";
+    $do = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($do);
+    $id = $row['id'];
+    $extension = array('pdf', 'docx', 'doc');
+    $extension_file = strtolower( pathinfo($filebt, PATHINFO_EXTENSION));
+    $file = pathinfo($filebt);
+    $flag = 0;
+    if(empty($filebt)){
+        echo "Hãy chọn file bài tập.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../fileNop/';
+        if(file_exists($path.$filebt)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $filebt;
+        }
+        $filePath = $path.$newfilename;
+        move_uploaded_file($filetmp, $filePath);
+        $sql = "update bainop set filename = '$newfilename' where id = '$id'";
+        $do = mysqli_query($conn, $sql);
+        unlink($path.$row['filename']);
+        return true;
+    }
+
+}
+
+function HienThiIframe($filename){
+    $iframe = "<iframe width='100%' height='100%' src='".$filename."'></iframe>";
+    $btn = "<a class='btn btn-primary' href='".$filename."'>Tải xuống file đề bài</a>";
+    if(pathinfo($filename, PATHINFO_EXTENSION) == 'pdf'){
+        echo $iframe;
+    } 
+    else{
+        echo $btn;
+    }
+}
+
+function SuaBaiTap2($tenbt, $hannop, $idBaiTap){
+    GLOBAL $conn;
+    $flag = 0;
+    if(empty($tenbt)){
+        echo "Hãy nhập tên bài tập.";
+        $flag = 1;
+    }
+    if(empty($hannop)){
+        echo "Hãy nhập hạn nộp bài tập.";
+        $flag = 1;
+    }
+
+    if($flag == 0){
+        //file		
+            $sql = "update noi_dung_chu_de set name = '$tenbt', hannop = '$hannop' where id = '$idBaiTap' ";
+            $do = mysqli_query($conn, $sql);
+            return true;
+    
+    }
+}
+function SuaBaiTap1($tenbt,  $hannop, $tenfile, $filetmp, $idBaiTap){
+    GLOBAL $conn;
+    $sql = "select filename from noi_dung_chu_de where id = '$idBaiTap'";
+    $do = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($do);
+    $oldfilename = $row['filename'];
+    
+    $flag = 0;
+    if(empty($tenbt)){
+        echo "Hãy nhập tên bài tập.";
+        $flag = 1;
+    }
+    if(empty($hannop)){
+        echo "Hãy nhập hạn nộp bài tập.";
+        $flag = 1;
+    }
+
+    if($flag == 0){
+        //file		
+        $path = '../fileBT/';
+        $filename = $tenfile;
+        $file = pathinfo($filename);
+        if(empty($tenfile) == false){
+            $extension = array('pdf', 'docx', 'doc');
+            $extension_file = strtolower( pathinfo($tenfile, PATHINFO_EXTENSION));
+            if(in_array($extension_file, $extension)){
+                unlink($path.$oldfilename);
+                if(file_exists($path.$filename)){
+                    $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+                }
+                else{
+                    $newfilename = $filename;
+                }
+                $filePath = $path.$newfilename;
+                move_uploaded_file($filetmp, $filePath);				
+                $sql = "update noi_dung_chu_de set name = '$tenbt', hannop = '$hannop', filename = '$newfilename' where id = '$idBaiTap' ";
+                $do = mysqli_query($conn, $sql);
+            }
+            
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+}
+
+function XoaBT($idBaiTap){
+    GLOBAL $conn;
+
+    $sql = "select filename from noi_dung_chu_de where id = '$idBaiTap'";
+    $do = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($do);
+    $path = '../fileBT/';
+    if(!empty($row['filename'])){
+        unlink($path.$row['filename']);
+    }
+
+    $sql = "delete from noi_dung_chu_de where id = '$idBaiTap'";
+    $do = mysqli_query($conn, $sql);
+    if($do == true){
+        return true;
+    }
+    return false;
+}
+
+function getChiTietBaiNop2($idBaiTap){
+    GLOBAL $conn;
+    $arr = [];
+    $sql = "select bainop.id as id, user_information.fullname as name, bainop.pass as pass, bainop.filename as filename, bainop.time as time from bainop, user_information where bainop.id_bai_tap = '$idBaiTap'  and bainop.user_id = user_information.username_id";
+    $do = mysqli_query($conn, $sql);
+    if(mysqli_num_rows($do)>0){
+        while($row = mysqli_fetch_assoc($do)){
+            $arr[] = $row;
+        }
+    }
+    return $arr;
+}
+
+function ChamBaiDat($idBaiNop){
+    GLOBAL $conn;
+    $sql = "update bainop set pass = 1 where id = '$idBaiNop'";
+    $do = mysqli_query($conn, $sql);
+}
+
+function ChamBaiKhongDat($idBaiNop){
+    GLOBAL $conn;
+    $sql = "update bainop set pass = 0 where id = '$idBaiNop'";
+    $do = mysqli_query($conn, $sql);
 }
 ///////////////////////////////////////////////////////
     
