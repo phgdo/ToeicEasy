@@ -55,6 +55,10 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li><a class="dropdown-item" href="thong_tin_ca_nhan.php">Thông tin cá nhân</a></li>
               <li><hr class="dropdown-divider"></li>
+              <?php if($_SESSION['level']==1){ ?>
+                <li><a class="dropdown-item" href="quan_ly_tai_khoan.php">Quản lý tài khoản</a></li>
+                <li><hr class="dropdown-divider"></li>
+              <?php } ?>
               <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
             </ul>
           </li>

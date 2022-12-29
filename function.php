@@ -302,72 +302,30 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         return false;
     }
 
-    // function checkTimeOut(){
-    //     GLOBAL $conn;
-    //     $sql = "select done from exams where exam_id = ".$examId."";
-    //     $query = mysqli_query($conn, $sql);
+    function ResetExam($examId){
+        GLOBAL $conn;
+        //Xoa cau tra loi
+        $sql = "delete from quiz_answer where exam_id = ".$examId."";
+        $query = mysqli_query($conn, $sql);
+        //Xoa bai kiem tra
+        $sql = "delete from exams where exam_id = ".$examId."";
+        $query = mysqli_query($conn, $sql);
+    }
+
+    // function ButtonStartQuiz(){
+    //     echo '
+    //     <div style="position: fixed;
+    //     width: 100%;
+    //     height: 100%;
+    //     left: 0;
+    //     top: 0;
+    //     background: rgba(51,51,51,0.7);
+    //     z-index: 10; ">
+    //         <input type="button" value="Bắt đầu làm bài" name="btnStart">
+    //     </div>
+    //     ';
+
     // }
-
-
-    function countDownTimer(){
-        echo "
-        <script>
-    // Set the date we're counting down to
-    // 1. JavaScript
-    // var countDownDate = new Date('Sep 5, 2018 15:37:25').getTime();
-    // 2. PHP
-    var countDownDate = <?php echo strtotime('now')+3+2 ?> * 1000;
-    var now = <?php echo time() ?> * 1000;
-
-    // Update the count down every 1 second
-    var x = setInterval(function() {
-
-        // Get todays date and time
-        // 1. JavaScript
-        // var now = new Date().getTime();
-        // 2. PHP
-        now = now + 1000;
-
-        // Find the distance between now an the count down date
-        var distance = countDownDate - now;
-
-        // Time calculations for days, hours, minutes and seconds
-        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        // Output the result in an element with id='countdown-timer'
-        document.getElementById('countdown-timer').innerHTML =  hours + 'h ' +
-            minutes + 'm ' + seconds + 's ';
-
-        // If the count down is over, write some text 
-        if (distance < 0) {
-            clearInterval(x);
-            document.getElementById('countdown-timer').innerHTML = 'EXPIRED';
-            var button = document.getElementById('btnSubmit');
-            button.form.submit();
-        }
-    }, 1000);
-    </script>
-        ";
-        
-    }
-
-    function ButtonStartQuiz(){
-        echo '
-        <div style="position: fixed;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
-        background: rgba(51,51,51,0.7);
-        z-index: 10; ">
-            <input type="button" value="Bắt đầu làm bài" name="btnStart">
-        </div>
-        ';
-
-    }
 
 
 
@@ -871,4 +829,45 @@ function ChamBaiKhongDat($idBaiNop){
 }
 ///////////////////////////////////////////////////////
     
+// Quản lý tài khoản
+
+function getTaiKhoan(){
+    GLOBAL $conn;
+    $sql = "select accounts.id, accounts.username, user_information.fullname, user_information.birthday, user_information.phone_number, user_information.email from accounts, user_information where accounts.id = user_information.username_id";
+    $query = mysqli_query($conn, $sql);
+    $arr = [];
+    if(mysqli_num_rows($query)>0){
+        while($row = mysqli_fetch_assoc($query)){
+            $arr[] = $row;
+        }
+    }
+    return $arr;
+}
+
+function xoaTK($userId){
+    GLOBAL $conn;
+    //Xóa thông tin từ bảng user_information
+    $sql = "delete from user_information where username_id=".$userId."";
+    $query = $do = mysqli_query($conn, $sql);
+    //Xóa thông tin từ bảng accounts
+    $sql = "delete from accounts where id=".$userId."";
+    $query = mysqli_query($conn, $sql);
+
+    //Xóa thông tin từ bảng exams
+    $sql = "select exam_id from exams where user_id=".$userId."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    if(mysqli_num_rows($query)>0){
+        $examId = $row['exam_id'];
+        $sql = "delete from exams where exam_id=".$examId."";
+        $query = mysqli_query($conn, $sql);
+        $sql = "delete from quiz_answer where exam_id=".$examId."";
+        $query = mysqli_query($conn, $sql);
+    }
+
+
+    //Refesh page
+    header("Refresh:0");
+}
+////////////////////////////////////////////////////////////////
 ?>

@@ -33,13 +33,20 @@
         calScore($examId);
         finishQuiz($examId);
     }
-    //Kiểm tra xem đã nộp bài chưa để ẩn nút Submit và hiển thị đáp án
+    //Kiểm tra xem đã nộp bài chưa (true là làm rồi, false là chưa làm) để ẩn nút Submit và hiển thị đáp án
     $done = 0;
     if(CheckExamDone($examId) == true){
         $done = 1;
     }
     else{
         $done = 0;
+    }
+
+    //Xu ly nut reset
+    if(isset($_POST['btnReset'])){
+        ResetExam($examId);
+        //Refesh lai trang 
+        header("Refresh:0");
     }
 
 ?>
@@ -112,6 +119,17 @@
         <!-- Câu hỏi -->
         
         <div class="question-list">
+            <?php 
+            //Kiểm tra đã làm bài chưa, nếu rồi và muốn làm lại thì hiển thị nút reset
+            
+                if($done==1){
+                    echo '
+                    <form action="" method="post">
+                        <input type="submit" value="Reset Exam" name="btnReset">
+                    </form>
+                    ';
+                }
+            ?>
 
             <div class="question-list-row">
                 <?php 
@@ -137,6 +155,7 @@
         <div class="quiz-list">
         <?php 
             foreach ($questions as $value){
+                //Hiển thị part 1
                 echo "<h4>". "Question " . $value["sentence_id"]. "</h4>";
                 if($value['question']!= 'null' || $value['question']!= 'NULL'){
                     echo $value['question'];
