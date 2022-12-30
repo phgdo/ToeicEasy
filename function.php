@@ -1223,6 +1223,14 @@ function ThemBaiTap($tenbt, $hannop, $tenfile, $filetmp, $topicId){
     }
 }
 
+function getChuDe( $topicId){
+    GLOBAL $conn;
+    $sql = "select * from topic_grammar where id = '$topicId'";
+    $do = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($do);
+    return $row['name'];
+}
+
 function SuaChuDe($tenchude, $topicId){
     GLOBAL $conn;
     if(!empty($tenchude)){

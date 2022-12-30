@@ -11,6 +11,7 @@
 			echo "Hãy nhập tên chủ đề.";
 		}
 	}
+	$chude = getChuDe($topic_id);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +33,7 @@
 			<h3>Sửa chủ đề</h3>
 			<div class="mb-3">
 			  <label for="ten_chu_de" class="form-label">Tên chủ đề</label>
-			  <input type="text" class="form-control" id="ten_chu_de" name="ten_chu_de" placeholder="Nhập tên chủ đề">
+			  <input type="text" class="form-control" id="ten_chu_de" name="ten_chu_de" placeholder="Nhập tên chủ đề" value="<?php echo $chude; ?>">
 			</div>
 			<input type="submit" class="btn btn-primary" name="saveChuDe" value="Lưu">			
 			<a href="bai_tap_khoa_hoc.php" class="btn btn-primary">Trở lại</a>
