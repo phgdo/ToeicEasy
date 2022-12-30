@@ -43,7 +43,7 @@
                 <?php 
                     if($flag == 1){
                         echo '<a href="sua_de.php?topic_id='.$value['id'].'" class="btn btn-primary">Sửa</a>';
-                        echo '<a href="them_sua_cau_hoi.php?topic_id='.$value['id'].'" class="btn btn-primary">Thêm sửa câu hỏi</a>';
+                        echo '<a href="quan_ly_quiz.php?topic_id='.$value['id'].'" class="btn btn-primary">Quản lý</a>';
                     } 
                 ?>
                     <div class="progress-box"><?php echo $score = getScoreFromExams($value['id'], $_SESSION['userId']) . " pts"; ?></div>

@@ -1,5 +1,6 @@
 <?php 
 	include_once '../function.php';
+	checkLogin();
 	$idBT = $_GET['id_bt'];
 	$baitap = getChiTietBaiTap($idBT);
 	$userId = $_SESSION['userId'];

@@ -1,5 +1,7 @@
 <?php 
 	include_once '../function.php';
+	checkLogin();
+	ChanNguoiDung();
 	$topic_id = $_GET['topic_id'];
 	if(isset($_POST['saveBaiTap'])){
 		ThemBaiTap($_POST['ten_bai_tap'], $_POST['han_nop'], $_FILES['file_de_bai']['name'], $_FILES['file_de_bai']['tmp_name'], $topic_id);

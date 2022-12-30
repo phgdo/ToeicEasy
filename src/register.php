@@ -35,6 +35,7 @@
                 <br>
                 <input type="submit" value="Register" name="btn-register">
             </form>
+            <a href="login.php">Login</a>
         </div>
     </div>
     <?php 

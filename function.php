@@ -2,7 +2,11 @@
     session_start();
     include_once 'connectdb.php';
     
-
+function ChanNguoiDung(){
+    if($_SESSION['level'] == '0'){
+        header("location: dashboard.php");
+    }
+}
     //Navar
 
     ///////////////////////////////////////////////
@@ -145,44 +149,677 @@ function getCauHoi($topicId){
     }
     return $questions;
 }
-
-function themCauHoi($topicId, $partId, $sentence_id, $audioPath, $imagePath, $question, $text){
+// function KiemTraCauHoiPart1($audioPath, $imagePath, $a, $b, $c, $d, $isCorrect){
+//     if(empty($audioPath) || empty($imagePath) || empty($a)|| empty($b)|| empty($c)|| empty($d) || empty($isCorrect)){
+//         return false;
+//     }
+//     return true;
+// }
+function themCauHoiPart1($topicId, $sentence_id, $audioPath, $audioTemp, $imagePath, $imageTemp,$a, $b, $c, $d, $isCorrect){
     GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    // Xử lý file ảnh
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, image_path) 
+    values('".$topicId."', '1', '".$sentence_id."', '".$fileNghe."', '".$fileAnh."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+
+function themCauHoiPart2($topicId, $sentence_id, $audioPath, $audioTemp,$a, $b, $c, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path) 
+    values('".$topicId."', '2', '".$sentence_id."', '".$fileNghe."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c);
+    for($i=1; $i<=3; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiPart3($topicId, $sentence_id, $question ,$audioPath, $audioTemp, $a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, question) 
+    values('".$topicId."', '3', '".$sentence_id."', '".$fileNghe."', '".$question."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+function themCauHoiPart3_2($topicId, $sentence_id, $question ,$audioPath, $audioTemp, $imagePath, $imageTemp,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    // Xử lý file ảnh
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, image_path, question) 
+    values('".$topicId."', '3', '".$sentence_id."', '".$fileNghe."', '".$fileAnh."', '".$question."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiPart4($topicId, $sentence_id, $question ,$audioPath, $audioTemp, $a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, question) 
+    values('".$topicId."', '4', '".$sentence_id."', '".$fileNghe."', '".$question."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+function themCauHoiPart4_2($topicId, $sentence_id, $question ,$audioPath, $audioTemp, $imagePath, $imageTemp,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    // Xử lý file ảnh
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, image_path, question) 
+    values('".$topicId."', '4', '".$sentence_id."', '".$fileNghe."', '".$fileAnh."', '".$question."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiCoAnhVaAudio($topicId, $sentence_id, $part_id, $question , $text,$audioPath, $audioTemp, $imagePath, $imageTemp,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+    // Xử lý file ảnh
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+
+
     $sql = "insert into question (topic_id, part_id, sentence_id, audio_path, image_path, question, text) 
-    values('".$topicId."', '".$partId."', '".$sentence_id."', '".$audioPath."', '".$imagePath."', '".$question."', '".$text."')";
+    values('".$topicId."', '".$part_id."', '".$sentence_id."', '".$fileNghe."', '".$fileAnh."', '".$question."', '".$text."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiCoAnh($topicId, $sentence_id, $part_id, $question , $text, $imagePath, $imageTemp,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    
+
+    // Xử lý file ảnh
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, image_path, question, text) 
+    values('".$topicId."', '".$part_id."', '".$sentence_id."', '".$fileAnh."', '".$question."', '".$text."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiCoAudio($topicId, $sentence_id, $part_id, $question , $text,$audioPath, $audioTemp,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+    // Xử lý file nghe
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+
+
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, audio_path,  question, text) 
+    values('".$topicId."', '".$part_id."', '".$sentence_id."', '".$fileNghe."', '".$question."', '".$text."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoi($topicId, $sentence_id, $part_id, $question , $text,$a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, question, text) 
+    values('".$topicId."', '".$part_id."', '".$sentence_id."',  '".$question."', '".$text."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themCauHoiPart5($topicId, $sentence_id, $question , $a, $b, $c, $d, $isCorrect){
+    GLOBAL $conn;
+
+    $sql = "insert into question (topic_id, part_id, sentence_id, question) 
+    values('".$topicId."', '5', '".$sentence_id."', '".$question."')";
+    $query = mysqli_query($conn, $sql);
+
+    
+    // Thêm quiz_option vào db
+
+    $sql = "select question_id from question where topic_id = ".$topicId." and sentence_id = ".$sentence_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    $flag = 0;
+    $quiz_opt = array($a, $b, $c, $d);
+    for($i=1; $i<=4; $i++){
+        if($i == (int)$isCorrect){
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '1');
+        }
+        else{
+            themLuaChon($row['question_id'], $i, $quiz_opt[$i-1], '0');
+        }
+    } 
+}
+
+function themLuaChon($questionId, $numOpt ,$opt, $isCorrect){
+    GLOBAL $conn;
+    $sql = "insert into quiz_options (question_id, numOption, opt, is_correct) 
+        values('".$questionId."', '".$numOpt."', '".$opt."', '".$isCorrect."')";
     $query = mysqli_query($conn, $sql);
 }
 
-function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
-        $extension = array('mp3', 'wma', 'wav');
-		$extension_file = strtolower( pathinfo($filebt, PATHINFO_EXTENSION));
-        $file = pathinfo($filebt);
-		$flag = 0;
-		if(empty($filebt)){
-			echo "Hãy chọn file audio.";
-			$flag = 1;
-            return false;
-		}
-		if(!in_array($extension_file, $extension)){
-			echo "Hãy chọn đúng loại file audio.";
-			$flag = 1;
-            return false;
-		}
-		if($flag == 0){
-            $path = '../fileNop/';
-			if(file_exists($path.$filebt)){
-                $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
-            }
-            else{
-                $newfilename = $filebt;
-            }
-			$filePath = $path.$newfilename;
-			move_uploaded_file($filetmp, $filePath);
-			$sql = "update bainop set filename = '$newfilename' where id = '$id'";
-			$do = mysqli_query($conn, $sql);
-            unlink($path.$row['filename']);
-			return true;
-		}
+
+
+function SuaFileNghe($filebt, $filetmp, $partId, $topicId){
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($filebt, PATHINFO_EXTENSION));
+    $file = pathinfo($filebt);
+    $flag = 0;
+    if(empty($filebt)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio';
+        if(file_exists($path.$filebt)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $filebt;
+        }
+        $filePath = $path.$newfilename;
+        move_uploaded_file($filetmp, $filePath);
+        $sql = "update bainop set filename = '$filePath' where id = '$id'";
+        $do = mysqli_query($conn, $sql);
+        unlink($path.$row['filename']);
+        return true;
+    }
 }
 
 /////////////////////////////
@@ -245,7 +882,7 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
 
     function getQuestions($topicId){
         GLOBAL $conn;
-        $sql = "select * from question where topic_id = '$topicId'";
+        $sql = "select * from question where topic_id = '$topicId' order by sentence_id";
         $query = mysqli_query($conn, $sql);
         $arr = [];
         while ($row = mysqli_fetch_assoc($query)){
@@ -352,19 +989,13 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         $sql = "select your_ans from quiz_answer where question_id=".$questionId." and exam_id = ".$examId."";
         $query = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($query);
-        return $row['your_ans'];
+        if(mysqli_num_rows($query) > 0 ){
+            return $row['your_ans'];
+        }
     }
 
-    // function getValueForQuizAns($examId){
-    //     GLOBAL $conn;
-    //     $sql = "select * from quiz_answer where exam_id=".$examId."";
-    //     $query = mysqli_query($conn, $sql);
-    //     $quizs = [];
-    //     while ($row = mysqli_fetch_assoc($query)){
-    //         $quizs[] = $row;
-    //     }
-    //     return $quizs;
-    // }
+
+
 
     function startQuiz($topicId, $userId){
         GLOBAL $conn;
@@ -467,6 +1098,36 @@ function XuLyFileNghe($filebt, $filetmp, $partId, $topicId){
         $sql = "update exams set time_end=current_timestamp, done = 1 where exam_id=".$examId."";
         $query = mysqli_query($conn, $sql);
     }
+
+    function drawPart1($question){
+        echo '<img src="'.$question['image_path'].'" alt="'.$question['image_path'].'" class="imagequiz">';
+        echo '<audio class="audioquiz" src="'.$question['audio_path'].'" controls>
+            </audio>';
+
+
+    }
+
+    function drawPart2($question){
+        echo '<audio class="audioquiz" src="'.$question['audio_path'].'" controls>
+            </audio>';
+    }
+    function drawPart3($question){
+            echo '<audio class="audioquiz" src="'.$question['audio_path'].'" controls>
+            </audio>';
+            
+    }
+    function drawPart4($question){
+        echo '<img src="'.$question['image_path'].'" alt="'.$question['image_path'].'" class="imagequiz">';
+        echo '<audio class="audioquiz" src="'.$question['audio_path'].'" controls>
+        </audio>';
+}
+    function drawPart5($question){
+        echo '<h6>'.$question['question'].'</h6>';
+    }
+
+    function drawPart6($question){
+        echo '<p>'.$question['text'].'</p>';
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
     //Test_select page
     function getTopic(){
@@ -591,12 +1252,10 @@ function getChiTietBaiTap($idBaiTap){
 
 function GetChiTietBaiNop($idBaiTap, $userId){
     GLOBAL $conn;
-    $sql = "select * from bainop where id = '$idBaiTap' and user_id = '$userId'";
+    $sql = "select * from bainop where id_bai_tap = '$idBaiTap' and user_id = '$userId'";
     $do = mysqli_query($conn, $sql);
-    if(mysqli_num_rows($do)>0){
-        $row = mysqli_fetch_assoc($do);
-        return $row;
-    }
+    $row = mysqli_fetch_assoc($do);
+    return $row;
 }
 
 function GetHanNop($idBaiTap){
@@ -870,4 +1529,122 @@ function xoaTK($userId){
     header("Refresh:0");
 }
 ////////////////////////////////////////////////////////////////
+
+
+// Sửa câu hỏi
+function getCauHoi2($question_id){
+    GLOBAL $conn;
+    $sql = "select * from question where question_id=".$question_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    return $row;
+}
+
+function updateQuestion($question_id, $part_id, $sentence_id, $question, $text){
+    GLOBAL $conn;
+    $sql = "update question set part_id = ".$part_id.", sentence_id=".$sentence_id.", question=".$question.", text=".$text." where question_id=".$question_id."";
+    $query = mysqli_query($conn, $sql);
+}
+
+function updateQuizOption($question_id, $numOpt, $opt, $isCorrect){
+    GLOBAL $conn;
+    $sql = "update quiz_options set opt = '".$opt."', is_correct='".$isCorrect."' where question_id='".$question_id."' and numOption = '".$numOpt."'";
+    $query = mysqli_query($conn, $sql);
+}
+
+function updateImage($question_id, $imagePath, $imageTemp){
+    GLOBAL $conn;
+    $sql = "select image_path from question where question_id=".$question_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    unlink($row['image_path']);
+
+    $extension = array('png', 'jpeg', 'jpg');
+    $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
+    $file = pathinfo($imagePath);
+    $flag = 0;
+    if(empty($imagePath)){
+        echo "Hãy chọn file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file ảnh.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Image/';
+        if(file_exists($path.$imagePath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $imagePath;
+        }
+        $fileAnh = $path.$newfilename;
+        move_uploaded_file($imageTemp, $fileAnh);
+    }
+    $sql = "update question set image_path = '".$fileAnh."' where question_id='".$question_id."'";
+    $query = mysqli_query($conn, $sql);
+}
+
+function updateAudio($question_id, $audioPath, $audioTemp){
+    GLOBAL $conn;
+    $sql = "select audio_path from question where question_id=".$question_id."";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    // unlink($row['audio_path']);
+
+    $extension = array('mp3', 'wma', 'wav');
+    $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
+    $file = pathinfo($audioPath);
+    $flag = 0;
+    if(empty($audioPath)){
+        echo "Hãy chọn file audio.";
+        $flag = 1;
+        return false;
+    }
+    if(!in_array($extension_file, $extension)){
+        echo "Hãy chọn đúng loại file audio.";
+        $flag = 1;
+        return false;
+    }
+    if($flag == 0){
+        $path = '../De/Audio/';
+        if(file_exists($path.$audioPath)){
+            $newfilename = $file['filename'] . uniqid(rand(), true) . '.'. $extension_file;
+        }
+        else{
+            $newfilename = $audioPath;
+        }
+        $fileNghe = $path.$newfilename;
+        move_uploaded_file($audioTemp, $fileNghe);
+    }
+    $sql = "update question set audio_path = '".$fileNghe."' where question_id='".$question_id."'";
+    $query = mysqli_query($conn, $sql);
+
+}
+
+
+/////////////////////////////
+
+// Xóa câu hỏi
+
+function xoaCauHoi($question_id){
+    GLOBAL $conn;
+    $sql = "select * from question where question_id='".$question_id."' ";
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    if(!empty($row['image_path'])){
+        unlink($row['image_path']);
+    }
+    if(!empty($row['audio'])){
+        unlink($row['audio']);
+    }
+    $sql = "delete from question where question_id='".$question_id."' ";
+    $query = mysqli_query($conn, $sql);
+    $sql = "delete from quiz_options where question_id='".$question_id."' ";
+    $query = mysqli_query($conn, $sql);
+}
+////////////////////////////////
 ?>

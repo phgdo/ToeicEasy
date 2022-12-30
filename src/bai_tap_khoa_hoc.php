@@ -1,5 +1,6 @@
 <?php 
 	include_once '../function.php';
+	checkLogin();
     $flag = 0;
 	if($_SESSION['level'] == 1){
         $flag = 1;

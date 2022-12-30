@@ -1,6 +1,7 @@
 
 <?php 
     include_once '../function.php';
+    checkLogin();
     $part = getPartOfToeic();
     $topicId = $_GET['topicId'];
     $questions = getQuestions($topicId);
@@ -48,6 +49,9 @@
         //Refesh lai trang 
         header("Refresh:0");
     }
+
+    // Mảng các chữ cái đại diện cho các câu
+    $letters = array("(A) ", "(B) ", "(C) ", "(D) ", )
 
 ?>
 <!DOCTYPE html>
@@ -136,9 +140,8 @@
                 foreach ($questions as $value){
                 ?>
                 <button  tabindex="0" type="button">
-                <?php 
-                echo $value['sentence_id'];
-                ?>
+                <a href="#<?php echo $value['sentence_id'] ?>"  style="text-decoration:none"><?php echo $value['sentence_id'];?></a>
+
                     <span class="MuiTouchRipple-root css-w0pj6f">
 
                     </span>
@@ -156,37 +159,178 @@
         <?php 
             foreach ($questions as $value){
                 //Hiển thị part 1
-                echo "<h4>". "Question " . $value["sentence_id"]. "</h4>";
-                if($value['question']!= 'null' || $value['question']!= 'NULL'){
-                    echo $value['question'];
+                echo "<h4 id=".$value["sentence_id"].">". "Question " . $value["sentence_id"]. "</h4>";
+                if($value['sentence_id']>='1' && $value['sentence_id']<='6'){
+                    drawPart1($value);
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+                                    //$i để in ra (A) , (B)
+                                    $i = 0;
+                                    foreach($quizs as $quiz){   
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i]; ?><?php if($done == 1){echo $quiz["opt"];}  ?></label>
+                                        </div>
+                                <?php 
+                                    $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
                 }
-                if($value['image_path']!= 'null' || $value['image_path']!= 'NULL'){
-                    echo '<img src="'.'../'.$value['image_path'].'" alt="'.$value['image_path'].'" class="imagequiz">';
+                // Hiển thị part 2
+                else if($value['sentence_id']>='7' && $value['sentence_id']<='31'){
+                    drawPart2($value);
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+                                    $i = 0;
+                                    foreach($quizs as $quiz){      
+                                        if($i==3){continue;}       
+    
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i] ?><?php if($done == 1){echo $quiz["opt"];}  ?></label>
+                                        </div>
+                                <?php 
+                                $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
+                }
+                // Hiển thị part 3
+                else if($value['sentence_id']>='32' && $value['sentence_id']<='70'){
+                    // $p3 = array('32', '35', '38', '41', '44', '47', '50', '53', '56', '35')
+                    for($i=32; $i<=70; $i+=3){
+                        if((int)$value['sentence_id'] == $i){
+                            drawPart3($value);
+                        }
+                    }
+                    echo '<h6>'.$value['question'].'</h6>';
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+                                    $i = 0;        
+                                    foreach($quizs as $quiz){  
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i] ?><?php echo $quiz["opt"]; ?></label>
+                                        </div>
+                                <?php 
+                                $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
 
                 }
-                if($value['audio_path']!= 'null' || $value['audio_path']!= 'NULL'){
-                    echo '<audio class="audioquiz" src="'.'../'.$value['audio_path'].'" controls>
-                    </audio>';
+
+                // Hiển thị part 4
+                else if($value['sentence_id']>='71' && $value['sentence_id']<='100'){
+                    // $p3 = array('32', '35', '38', '41', '44', '47', '50', '53', '56', '35')
+                    for($i=71; $i<=100; $i+=3){
+                        if((int)$value['sentence_id'] == $i){
+                            drawPart4($value);
+                        }
+                    }
+                    echo '<h6>'.$value['question'].'</h6>';
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+                                    $i = 0;        
+                                    foreach($quizs as $quiz){  
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i] ?><?php echo $quiz["opt"]; ?></label>
+                                        </div>
+                                <?php 
+                                $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
+
+                }
+
+                //Hiển thị part 5
+                else if($value['sentence_id']>='101' && $value['sentence_id']<='130'){
+                    drawPart5($value);
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+        
+                                    foreach($quizs as $quiz){  
+                                        $i = 0;        
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i] ?><?php echo $quiz["opt"]; ?></label>
+                                        </div>
+                                <?php 
+                                $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
+                }
+                // Hiển thị part 6 và 7
+                else if($value['sentence_id']>='131' && $value['sentence_id']<='200'){
+                    // $p3 = array('32', '35', '38', '41', '44', '47', '50', '53', '56', '35')
+                    for($i=131; $i<=200; $i+=3){
+                        if((int)$value['sentence_id'] == $i){
+                            drawPart6($value);
+                        }
+                    }
+                    echo '<h6>'.$value['question'].'</h6>';
+                    ?>
+                    <div class="quiz-item">
+                        <div>
+                                <?php 
+                                    $quizs = getQuizOptions($value["question_id"]);
+                                    $i = 0;        
+                                    foreach($quizs as $quiz){  
+                                ?>
+                                        <div class="radio">
+                                            <label>
+                                            <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $letters[$i] ?><?php echo $quiz["opt"]; ?></label>
+                                        </div>
+                                <?php 
+                                $i++;
+                                }
+                                ?>
+        
+                        </div> 
+                    </div>
+                <?php
+
                 }
             ?>
-            <div class="quiz-item">
-                <div>
-                        
-                        <?php 
-                            $quizs = getQuizOptions($value["question_id"]);
-
-                            foreach($quizs as $quiz){          
-                        ?>
-                                <div class="radio">
-                                    <label>
-                                    <input type="radio" <?php if($done == 1) {if(getValueForQuizAns($value["question_id"], $examId) == $quiz["numOption"] && $flag ==1){echo "checked";} }?> name="optradio[<?php echo $quiz['question_id']; ?>]" id="optradio[<?php echo $quiz['question_id']; ?>]" value="<?php echo $quiz["numOption"]; ?>"><?php echo $quiz["opt"]; ?></label>
-                                </div>
-                        <?php 
-                        }
-                        ?>
-
-                </div> 
-            </div>
             <?php 
             }
             ?>

@@ -1,5 +1,6 @@
 <?php 
 	include_once '../function.php';
+	ChanNguoiDung();
     $idBT = $_GET['id_bt'];
     if(XoaBT($idBT)){
         $alert = 'Xóa bài tập thành công.';

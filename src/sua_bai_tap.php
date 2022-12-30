@@ -1,8 +1,8 @@
 <?php 
 	include_once '../function.php';
-
+	checkLogin();
 	$idbt = $_GET['id_bt'];
-
+	ChanNguoiDung();
 	if(isset($_POST['saveBaiTap'])){
 		if(empty($_FILES['file_de_bai']['name'])){
 			if(SuaBaiTap2($_POST['ten_bai_tap'], $_POST['han_nop'], $idbt)){
