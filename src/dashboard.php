@@ -17,10 +17,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 </head>
 <body>
+<main style="min-height: 100vh; max-width: 100%;">
+
     <?php include 'navbar.php'; ?>
     <?php 
         echo "Hello ". $userInformation['fullname'];
     ?>
+</main>
 </body>
 <?php include 'footer.php'; ?>
 </html>

@@ -45,6 +45,7 @@
 <body>
 
 	<main style="min-height: 100vh; max-width: 100%;">
+	<?php include 'navbar.php'; ?>
 		<div class="d-flex justify-content-center">
 		<form action="" method="POST" class="w-50" enctype="multipart/form-data">
 			<h3>Sửa bài tập</h3>
@@ -69,5 +70,5 @@
 	</main>
 
 </body>
-	
+<?php include 'footer.php'; ?>	
 </html>

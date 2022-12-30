@@ -26,6 +26,7 @@
 </head>
 <body>
 	<main style="min-height: 100vh; max-width: 100%;">
+	<?php include 'navbar.php'; ?>
 		<div class="d-flex justify-content-center">
 		<form action="" method="POST" class="w-50">
 			<h3>Sửa chủ đề</h3>
@@ -39,6 +40,6 @@
 		</div>
 	</main>
 </body>
-
+<?php include 'footer.php'; ?>
 	
 </html>

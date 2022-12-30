@@ -1,5 +1,6 @@
 <?php 
 	include_once '../function.php';
+	checkLogin();
 	ChanNguoiDung();
     $idBT = $_GET['id_bt'];
     if(XoaBT($idBT)){
@@ -31,3 +32,4 @@
 	</main>
 	<div class="alert-primary text-center p-2" style="margin-top: 15px;" role="alert">ProjectPHP - 2022</div>
 </body>
+<?php include 'footer.php'; ?>

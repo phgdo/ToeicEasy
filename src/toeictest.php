@@ -79,7 +79,7 @@
         // 1. JavaScript
         // var countDownDate = new Date('Sep 5, 2018 15:37:25').getTime();
         // 2. PHP
-        var countDownDate = <?php echo strtotime('now')+2*60*60 +2 ?> * 1000;
+        var countDownDate = <?php echo strtotime('now')+2*60*60 ?> * 1000;
         var now = <?php echo time() ?> * 1000;
 
         // Update the count down every 1 second
@@ -118,6 +118,8 @@
 </head>
 <body>
     <?php include 'navbar.php';?>
+    <main style="min-height: 100vh; max-width: 100%;">
+
     <p id="countdown-timer"></p>
     <div class = "main-content">
         <!-- Câu hỏi -->
@@ -350,7 +352,7 @@
 
     </div>
 
-
+    </main>
 </body>
 <?php include 'footer.php'; ?>
 </html>

@@ -19,10 +19,12 @@
 </head>
 <body>
 	<main style="min-height: 100vh; max-width: 100%;">
+	<?php include 'navbar.php'; ?>
 		<h2>Xóa chủ đề thành công</h2>
 		<a href="bai_tap_khoa_hoc.php" class="btn btn-primary">Trở lại</a>
 	</main>
 </body>
+<?php include 'footer.php'; ?>
 
 	
 </html>
