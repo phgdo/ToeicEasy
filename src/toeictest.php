@@ -1,10 +1,10 @@
 
 <?php 
     include_once '../function.php';
-    checkLogin();
-    $part = getPartOfToeic();
+    // checkLogin();
     $topicId = $_GET['topicId'];
     $questions = getQuestions($topicId);
+    shuffle($questions);
     $flag = 0;
     if(checkExamExists($topicId, $_SESSION['userId']) == true){
             //Nếu user chưa làm bài này thì tạo 1 quiz mới
@@ -31,7 +31,9 @@
                 getQuizAnswer($examId, $option_num, $option_val);
             }
         }
+        //Tính điểm
         calScore($examId);
+        // kết thúc quiz
         finishQuiz($examId);
     }
     //Kiểm tra xem đã nộp bài chưa (true là làm rồi, false là chưa làm) để ẩn nút Submit và hiển thị đáp án
@@ -51,7 +53,8 @@
     }
 
     // Mảng các chữ cái đại diện cho các câu
-    $letters = array("(A) ", "(B) ", "(C) ", "(D) ", )
+    $letters = array("(A) ", "(B) ", "(C) ", "(D) ");
+    $score = getScoreFromExams($topicId, $_SESSION['userId']);
 
 ?>
 <!DOCTYPE html>
@@ -79,7 +82,8 @@
         // 1. JavaScript
         // var countDownDate = new Date('Sep 5, 2018 15:37:25').getTime();
         // 2. PHP
-        var countDownDate = <?php echo strtotime('now')+2*60*60 ?> * 1000;
+        //1000 milisecond
+        var countDownDate = <?php echo strtotime('now')+2*60*60 ?> * 1000; 
         var now = <?php echo time() ?> * 1000;
 
         // Update the count down every 1 second
@@ -129,6 +133,7 @@
             //Kiểm tra đã làm bài chưa, nếu rồi và muốn làm lại thì hiển thị nút reset
             
                 if($done==1){
+                    echo $score . "pts";
                     echo '
                     <form action="" method="post">
                         <input type="submit" value="Reset Exam" name="btnReset">
@@ -140,6 +145,7 @@
             <div class="question-list-row">
                 <?php 
                 foreach ($questions as $value){
+                    if($value['open']==1){
                 ?>
                 <button  tabindex="0" type="button">
                 <a href="#<?php echo $value['sentence_id'] ?>"  style="text-decoration:none"><?php echo $value['sentence_id'];?></a>
@@ -151,6 +157,7 @@
 
                 <?php 
                     }
+                }
                 ?>
             </div>
         </div>
@@ -160,6 +167,7 @@
         <div class="quiz-list">
         <?php 
             foreach ($questions as $value){
+                if($value['open']==1){
                 //Hiển thị part 1
                 echo "<h4 id=".$value["sentence_id"].">". "Question " . $value["sentence_id"]. "</h4>";
                 if($value['sentence_id']>='1' && $value['sentence_id']<='6'){
@@ -335,6 +343,7 @@
             ?>
             <?php 
             }
+        }
             ?>
         </div>
         <?php 

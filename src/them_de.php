@@ -1,6 +1,6 @@
 <?php
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     ChanNguoiDung();
     $topic = getTopic();
     $flag = 0;

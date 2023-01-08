@@ -1,13 +1,19 @@
 <?php
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     ChanNguoiDung();
     $flag = 0;
     if($_SESSION['level'] == 1){
         $flag = 1;
     }
     $question_id = $_GET['question_id'];
-
+    $topicId = getTopicFromQuestion($question_id);
+    if(isset($_POST['btnXoaAnh'])){
+        xoaAnh($question_id);
+    }
+    if(isset($_POST['btnXoaAudio'])){
+        xoaAudio($question_id);
+    }
 
     if(isset($_POST['saveCauHoi'])){
         if(!empty($_POST['phan']) && !empty($_POST['sothutu']) && !empty($_POST['a']) && !empty($_POST['b']) && !empty($_POST['c']) && !empty($_POST['optradio'])){
@@ -49,10 +55,11 @@
                 for($i=1; $i<=4; $i++){
                     if($i == (int)$isCorrect){
                         updateQuizOption($question_id, $i, $qu[$i-1], '1');
-    
+
                     }
                     else{
                         updateQuizOption($question_id, $i, $qu[$i-1], '0');
+
                     }
     
                 }
@@ -62,10 +69,12 @@
                 for($i=1; $i<=3; $i++){
                     if($i == (int)$isCorrect){
                         updateQuizOption($question_id, $i, $qu[$i-1], '1');
+
     
                     }
                     else{
                         updateQuizOption($question_id, $i, $qu[$i-1], '0');
+
                     }
     
                 }
@@ -98,7 +107,6 @@
 
 
 		<form action="" method="POST" class="w-50" enctype="multipart/form-data">
-
             <div class="mb-3">
 			  <label for="ten_de" class="form-label">Phần số:</label>
 			  <input type="number" min = "1" max="7" class="form-control" id="ten_de" name="phan" placeholder="Nhập số phần" value="<?php echo $question['part_id']; ?>" >
@@ -113,6 +121,11 @@
             <div class="mb-3">
 			  <label for="ten_de" class="form-label">File nghe: <?php echo $question['audio_path']; ?></label>
               <input type="file" name="audio" id="" value="">
+              <?php 
+                if(!empty($question['audio_path'])){
+                    echo '<input type="submit" name="btnXoaAudio" value="Xoa file nghe">';
+                }
+              ?>
 			</div>
             <?php
                 }
@@ -123,6 +136,11 @@
             <div class="mb-3">
 			  <label for="ten_de" class="form-label">File ảnh: <?php echo $question['image_path']; ?></label>
               <input type="file" name="image" id="" value="">
+              <?php 
+                if(!empty($question['image_path'])){
+                    echo '<input type="submit" name="btnXoaAnh" value="Xoa anh">';
+                }
+              ?>
 			</div>
             <?php 
             }
@@ -184,7 +202,7 @@
             </div>
             <input type="submit" class="btn btn-primary" name="saveCauHoi" value="Lưu">
 	
-			<a href="test_select.php" class="btn btn-primary">Trở lại</a>
+			<a href="quan_ly_quiz.php?topic_id=<?php echo $topicId; ?>" class="btn btn-primary">Trở lại</a>
 		</form>
 		</div>
 	</main>

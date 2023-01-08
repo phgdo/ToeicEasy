@@ -106,13 +106,7 @@ function SuaThongTinCaNhan($userId, $ten, $ngaysinh, $sdt, $email){
         GLOBAL $conn;
         $sql = "insert into topic (year, name, deso) values ('".$nam."', '".$ten."', '".$so."')";
         $query = mysqli_query($conn, $sql);
-        $row = mysqli_fetch_assoc($query);
-        if (!file_exists('De/'.$ten.'')) {
-            mkdir('De/'.$ten.'', 0777, true);
-        }
-        else{
-            rename('De/'.$ten.'', "/home/user/login/docs/my_file.txt");
-        }
+
     }
 ////////////////////////////////////
 
@@ -128,12 +122,6 @@ function SuaDe($ten, $nam, $so, $topicId){
     GLOBAL $conn;
     $sql = "update topic set name='".$ten."', year='".$nam."', deso = '".$so."' where id = '".$topicId."'";
     $query = mysqli_query($conn, $sql);
-    if (!file_exists('De/'.$row['name'].'')) {
-        mkdir('De/'.$row['name'].'', 0777, true);
-    }
-    else{
-
-    }
 }
 ////////////////////////////////////
 
@@ -1009,15 +997,19 @@ function SuaFileNghe($filebt, $filetmp, $partId, $topicId){
 
     function calScore($examId){
         GLOBAL $conn;
+        // Lấy đáp án mà người dùng đã chọn
         $sql = "select * from quiz_answer where exam_id = ".$examId."";
         $query = mysqli_query($conn, $sql);
         $listeningPoint = 0;
         $readingPoint = 0;
         while ($row = mysqli_fetch_assoc($query)){
+            // Lấy đáp án của bộ câu hỏi với id và thứ tự của câu trả lời
             $sql2 = "select * from quiz_options where question_id = ".$row["question_id"]." and numOption = ".$row["your_ans"]."";
             $query2 = mysqli_query($conn, $sql2);
             while ($row2 = mysqli_fetch_assoc($query2)){
+                // Nếu lựa chọn của người dùng có trường is_correct = 1 thì người dùng chọn đáp án đúng
                 if($row2["is_correct"] == "1"){
+                    // Xem câu hỏi này ở phần nào
                     $sql3 = "select part_id from question where question_id = ".$row["question_id"]."";
                     $query3 = mysqli_query($conn, $sql3);
                     $row3 = mysqli_fetch_assoc($query3);
@@ -1059,10 +1051,10 @@ function SuaFileNghe($filebt, $filetmp, $partId, $topicId){
             $totalScore = 0;
         }
         else{
-            $totalScore = $readingScore + $readingScore;
+            $totalScore = $listeningScore + $readingScore;
         }
 
-
+        // update điểm
         $sql4 = "update exams set score=".$totalScore.", lisScore=".$listeningScore.", readScore=".$readingScore.", lisPoint=".$listeningPoint.", readPoint=".$readingPoint." where exam_id = ".$examId."";
         $query4 = mysqli_query($conn, $sql4);
     }
@@ -1287,7 +1279,7 @@ function KiemTraHanNop($idBaiTap){
 
 function KiemTraDaNopBaiNop($idBaiTap, $userId){
     GLOBAL $conn;
-    $sql = "select filename from bainop where id = '$idBaiTap' and user_id = '$userId'";
+    $sql = "select filename from bainop where id_bai_tap = '$idBaiTap' and user_id = '$userId'";
     $do = mysqli_query($conn, $sql);
 
     if(mysqli_num_rows($do)>0){
@@ -1340,6 +1332,7 @@ function SuaBaiNop( $userId, $filebt, $filetmp,$idBaiTap){
     $do = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($do);
     $id = $row['id'];
+    
     $extension = array('pdf', 'docx', 'doc');
     $extension_file = strtolower( pathinfo($filebt, PATHINFO_EXTENSION));
     $file = pathinfo($filebt);
@@ -1565,7 +1558,9 @@ function updateImage($question_id, $imagePath, $imageTemp){
     $sql = "select image_path from question where question_id=".$question_id."";
     $query = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($query);
-    unlink($row['image_path']);
+    if(!empty($row['image_path'])){
+        unlink($row['image_path']);
+    }
 
     $extension = array('png', 'jpeg', 'jpg');
     $extension_file = strtolower( pathinfo($imagePath, PATHINFO_EXTENSION));
@@ -1602,7 +1597,9 @@ function updateAudio($question_id, $audioPath, $audioTemp){
     $query = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($query);
     // unlink($row['audio_path']);
-
+    if(!empty($row['audio_path'])){
+        unlink($row['audio_path']);
+    }
     $extension = array('mp3', 'wma', 'wav');
     $extension_file = strtolower( pathinfo($audioPath, PATHINFO_EXTENSION));
     $file = pathinfo($audioPath);
@@ -1655,4 +1652,102 @@ function xoaCauHoi($question_id){
     $query = mysqli_query($conn, $sql);
 }
 ////////////////////////////////
+function GetMatKhauCu($oldPassword, $userId){
+    GLOBAL $conn;
+    $sql = "select password from accounts where id = ".$userId."";
+    $query = mysqli_query($conn, $sql);
+    if(mysqli_num_rows($query) > 0){
+        $row = mysqli_fetch_assoc($query);
+        if($oldPassword == $row['password']){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}
+
+function updateMatKhau($newPassword, $userId){
+    GLOBAL $conn;
+    $sql = "update accounts set password = '".$newPassword."' where id = ".$userId."";
+    $query = mysqli_query($conn, $sql);
+}
+
+
+function xoaAnh($question_id){
+    GLOBAL $conn;
+    $sql = "select image_path from question where question_id = ".$question_id."" ;
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    unlink($row['image_path']);
+    $sql = "update question set image_path = NULL where question_id = ".$question_id."" ;
+    $query = mysqli_query($conn, $sql);
+}
+
+function xoaAudio($question_id){
+    GLOBAL $conn;
+    $sql = "select audio_path from question where question_id = ".$question_id."" ;
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    unlink($row['audio_path']);
+    $sql = "update question set audio_path = NULL where question_id = ".$question_id."" ;
+    $query = mysqli_query($conn, $sql);
+}
+
+function getBaiLam($topicId){
+    GLOBAL $conn;
+    $sql = "select * from exams where topic_id = ".$topicId."" ;
+    $query = mysqli_query($conn, $sql);
+    $arr = [];
+    while($row = mysqli_fetch_assoc($query)){
+        $arr[] = $row;
+    }
+    return $arr;
+}
+function xoaBaiLam($examId){
+    GLOBAL $conn;
+    $sql = "delete from exams where exam_id = ".$examId."" ;
+    $query = mysqli_query($conn, $sql);
+    header("Refresh:0");
+}
+
+function getTopicFromQuestion($question_id){
+    GLOBAL $conn;
+    $sql = "select topic_id from question where question_id = ".$question_id."" ;
+    $query = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($query);
+    return $row['topic_id'];
+}
+
+function getAllScore($topicId){
+    GLOBAL $conn;
+    $sql = "select score from exams where topic_id = ".$topicId."" ;
+    $query = mysqli_query($conn, $sql);
+    $arr = [];
+    while($row = mysqli_fetch_assoc($query)){
+        $arr[] = $row;
+    }
+    return $arr;
+}
+
+function chuyenCauHoi($newTopicId, $question_id){
+    GLOBAL $conn;
+    $sql = "update question set topic_id = '".$newTopicId."' where question_id= '".$question_id."'";
+    $query = mysqli_query($conn, $sql);
+    header("Refresh:0");
+}
+
+function MoCauHoi($question_id){
+    GLOBAL $conn;
+    $sql = "update question set open = 1 where question_id = '$question_id'";
+    $do = mysqli_query($conn, $sql);
+}
+
+function DongCauHoi($question_id){
+    GLOBAL $conn;
+    $sql = "update question set open = 0 where question_id = '$question_id'";
+    $do = mysqli_query($conn, $sql);
+}
+
 ?>
+

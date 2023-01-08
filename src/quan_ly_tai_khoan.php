@@ -1,7 +1,7 @@
 <?php
     include_once '../function.php';
     ChanNguoiDung();
-    if(checkLogin());
+    // if(checkLogin());
     $flag = 0;
     if($_SESSION['level'] == 1){
         $flag = 1;

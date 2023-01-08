@@ -1,8 +1,7 @@
 <?php 
     include_once '../function.php';
-    include_once '../connectdb.php';
     // $conn = connectDB();
-
+    // checkLogin();
     if(isset($_POST['btn-login'])){
         $username = trim($_POST['username']);
         $password = trim($_POST['password']);

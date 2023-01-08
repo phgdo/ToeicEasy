@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	ChanNguoiDung();
 	$topic_id = $_GET['topic_id'];
 	if(isset($_POST['saveBaiTap'])){

@@ -1,19 +1,16 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	$idBT = $_GET['id_bt'];
 	$baitap = getChiTietBaiTap($idBT);
 	$userId = $_SESSION['userId'];
 	$bainop = GetChiTietBaiNop($idBT, $userId);
-
 	$path = '../fileBT/';
-
 	$alert = '';
 	//Nộp bài
 	if(isset($_POST['btnNopBai'])){
-		// $hannop = GetHanNop($idBT);
 		if(KiemTraHanNop($idBT)){
-			if(KiemTraDaNopBaiNop($idBT, $userId) == false){
+			if(!KiemTraDaNopBaiNop($idBT, $userId)){
 				if(NopBaiTap($userId, $_FILES['file_nop']['name'], $_FILES['file_nop']['tmp_name'], $idBT)){
 					$alert = "Nộp bài tập thành công";
 				}

@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	ChanNguoiDung();
     $idBT = $_GET['id_bt'];
     if(XoaBT($idBT)){

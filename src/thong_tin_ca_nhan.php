@@ -1,6 +1,6 @@
 <?php 
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     $flag = 0;
     if(isset($_POST['btnSuaThongTin'])){
         $flag = 1;

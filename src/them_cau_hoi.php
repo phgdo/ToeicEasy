@@ -1,6 +1,6 @@
 <?php
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     $flag = 0;
     if($_SESSION['level'] == 1){
         $flag = 1;
@@ -13,6 +13,7 @@
     // var_dump($questions);
 
     if(isset($_POST['saveCauHoi'])){
+        // Ít nhất là các trường này ko empty
         if(!empty($_POST['phan']) && !empty($_POST['sothutu']) && !empty($_POST['a']) && !empty($_POST['b']) && !empty($_POST['c']) && !empty($_POST['optradio'])){
             $part_id = $_POST['phan'];
             $sentence_id = $_POST['sothutu'];
@@ -38,9 +39,15 @@
                         $imageTemp = $_FILES['image']['tmp_name'];
                         
                         themCauHoiCoAnhVaAudio($topicId, $sentence_id, $part_id, $question , $text,$audio, $audioTemp, $image, $imageTemp,$a, $b, $c, $d, $isCorrect);
+                        echo '
+                            <script>alert("Thêm thành công");</script>
+                        ';
                     }
                     else{
                         themCauHoiCoAudio($topicId, $sentence_id, $part_id, $question , $text,$audio, $audioTemp,$a, $b, $c, $d, $isCorrect);
+                        echo '
+                            <script>alert("Thêm thành công");</script>
+                        ';
                     }
                 }
                 else{
@@ -65,9 +72,15 @@
                         $imageTemp = $_FILES['image']['tmp_name'];
                         
                         themCauHoiCoAnh($topicId, $sentence_id, $part_id, $question , $text, $image, $imageTemp,$a, $b, $c, $d, $isCorrect);
+                        echo '
+                            <script>alert("Thêm thành công");</script>
+                        ';
                     }
                     else{
                         themCauHoi($topicId, $sentence_id, $part_id, $question , $text,$a, $b, $c, $d, $isCorrect);
+                        echo '
+                            <script>alert("Thêm thành công");</script>
+                        ';
                     }
             }
         }
@@ -151,7 +164,7 @@
 			</div>
             <input type="submit" class="btn btn-primary" name="saveCauHoi" value="Lưu">
 	
-			<a href="test_select.php" class="btn btn-primary">Trở lại</a>
+            <a href="quan_ly_quiz.php?topic_id=<?php echo $topicId; ?>" class="btn btn-primary">Trở lại</a>
 		</form>
 		</div>
 	</main>

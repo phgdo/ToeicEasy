@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
     $flag = 0;
 	if($_SESSION['level'] == 1){
         $flag = 1;
@@ -35,6 +35,7 @@
 		//Giao vien
 		$topicGramar = getTopicGramar();
 		foreach ($topicGramar as $value){
+			if($value['open'] == "1"){
 				echo '
 				<div class="card w-75 mt-5">
 				<div class="card-body h2">
@@ -50,6 +51,7 @@
 				</div>';
 			$noidung = getNoiDungChuDe($value['id']);
 			foreach($noidung as $nd){
+				if($nd['open'] == 1){
 				echo '<div class="card w-75 mt-5">
 						<div class="card-body h2">
 						<h5>'.$nd['name'].'</h5>
@@ -63,6 +65,8 @@
 							';
 						}
 			}
+		}
+		}
 		}
 			
 	?>

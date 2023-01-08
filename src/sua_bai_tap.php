@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	$idbt = $_GET['id_bt'];
 	ChanNguoiDung();
 	if(isset($_POST['saveBaiTap'])){

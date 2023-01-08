@@ -1,7 +1,7 @@
 <?php 
 	include_once '../function.php';
 	ChanNguoiDung();
-	checkLogin();
+	// checkLogin();
 	$topic_id = $_GET['topic_id'];
 	XoaChuDe($topic_id);
 ?>

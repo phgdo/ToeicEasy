@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	$topic_id = $_GET['topic_id'];
 	ChanNguoiDung();
 	if(isset($_POST['saveChuDe'])){

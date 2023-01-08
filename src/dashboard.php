@@ -1,6 +1,5 @@
 <?php 
     include_once '../function.php';
-    if(checkLogin());
     $userInformation = getUserInformation();
 ?>
 <!DOCTYPE html>
@@ -23,6 +22,19 @@
     <?php 
         echo "Hello ". $userInformation['fullname'];
     ?>
+
+<a href="./test_select.php">
+    <section class="my-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-12">
+                    <img src="../assets/image/anhtoeic.jpg" class="img-fluid pb-3">
+                    <button type="submit" name="submit" class="btn btn-success">Luyện tập ngay</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    </a>
 </main>
 </body>
 <?php include 'footer.php'; ?>

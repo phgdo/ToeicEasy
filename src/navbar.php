@@ -1,3 +1,8 @@
+<?php 
+  if(!isset($_SESSION['userId'])){
+    header('location: login.php');
+  }
+?>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="dashboard.php">ToeicEasy</a>
@@ -40,6 +45,8 @@
                 <li><a class="dropdown-item" href="quan_ly_tai_khoan.php">Quản lý tài khoản</a></li>
                 <li><hr class="dropdown-divider"></li>
               <?php } ?>
+              <li><a class="dropdown-item" href="doi_mat_khau.php">Đổi mật khẩu</a></li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
             </ul>
           </li>

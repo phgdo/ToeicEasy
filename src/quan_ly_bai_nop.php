@@ -1,6 +1,6 @@
 <?php 
 	include_once '../function.php';
-	checkLogin();
+	// checkLogin();
 	ChanNguoiDung();
 	$idBaiTap = $_GET['id_bt'];
     $baitap = getChiTietBaiTap($idBaiTap);

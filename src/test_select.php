@@ -1,6 +1,6 @@
 <?php 
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     $topic = getTopic();
     $flag = 0;
     if($_SESSION['level'] == 1){
@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashBoard</title>
+    <title>Chọn đề thi</title>
 
     <link href="../assets/css/test.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -45,7 +45,8 @@
                 <?php 
                     if($flag == 1){
                         echo '<a href="sua_de.php?topic_id='.$value['id'].'" class="btn btn-primary">Sửa</a>';
-                        echo '<a href="quan_ly_quiz.php?topic_id='.$value['id'].'" class="btn btn-primary">Quản lý</a>';
+                        echo '<a href="quan_ly_quiz.php?topic_id='.$value['id'].'" class="btn btn-primary">Quản lý quiz</a>';
+                        echo '<a href="quan_ly_bai_lam.php?topic_id='.$value['id'].'" class="btn btn-primary">Quản lý bài làm</a>';
                     } 
                 ?>
                     <div class="progress-box"><?php echo $score = getScoreFromExams($value['id'], $_SESSION['userId']) . " pts"; ?></div>

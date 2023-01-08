@@ -1,12 +1,13 @@
 <?php
     include_once '../function.php';
-    if(checkLogin());
+    // if(checkLogin());
     $flag = 0;
     if($_SESSION['level'] == 1){
         $flag = 1;
     }
     ChanNguoiDung();
     $question_id = $_GET['question_id'];
+    $topicId = getTopicFromQuestion($question_id);
     xoaCauHoi($question_id);
     echo "Xóa thành công";
 ?>
@@ -27,8 +28,7 @@
 <?php include 'navbar.php';?>
 
 		<div class="d-flex justify-content-center">
-        <a href="test_select.php" class="btn btn-primary">Trở lại</a>
-
+        <a href="quan_ly_quiz.php?topic_id=<?php echo $topicId; ?>" class="btn btn-primary">Trở lại</a>
 
 	</main>
 </body>
